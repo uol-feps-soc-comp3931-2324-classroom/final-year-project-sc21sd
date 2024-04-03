@@ -1,34 +1,48 @@
-require('dotenv').config();
 const express = require('express');
-const axios = require('axios');
+const cors = require('cors');
+const sqlite3 = require('sqlite3').verbose();
+
+// Initialize Express app
 const app = express();
-const PORT = 3001;
+app.use(cors()); // Use CORS to avoid cross-origin issues if your frontend is on a different port during development
 
-app.use(express.json());
-
-app.get('/api/search', async (req, res) => {
-  const { query } = req.query;
-
-  if (!query) {
-    return res.status(400).json({ message: 'Query is required' });
+// Connect to SQLite database
+const db = new sqlite3.Database('./myfinanceapp.db', (err) => {
+  if (err) {
+    console.error(err.message);
   }
-
-  const url = `https://api.tiingo.com/tiingo/utilities/search?query=${encodeURIComponent(query)}`;
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Token ${process.env.TIINGO_API_KEY}`
-  };
-
-  try {
-    const response = await axios.get(url, { headers });
-    // Assuming the response from Tiingo matches the structure you provided
-    res.json(response.data); // Send Tiingo's response directly to the frontend
-  } catch (error) {
-    console.error('Error fetching data from Tiingo:', error);
-    res.status(500).json({ message: 'Error fetching data' });
-  }
+  console.log('Connected to the myfinanceapp database.');
 });
 
+app.get('/api/stocks/:ticker', (req, res) => {
+    const ticker = req.params.ticker.toUpperCase();
+    // Updated SQL query to fetch additional data
+    const sql = `SELECT date, openPrice AS open, dayHigh AS high, dayLow AS low, closePrice AS close 
+                 FROM stocks WHERE ticker = ? ORDER BY date`;
+  
+    db.all(sql, [ticker], (err, rows) => {
+      if (err) {
+        res.status(400).json({ "error": err.message });
+        return;
+      }
+      res.json({
+        "message": "success",
+        "data": rows
+      });
+    });
+  });
+  
+
+// Specify the port to listen on
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  db.close(() => {
+    console.log('Database connection closed.');
+    process.exit(0);
+  });
 });

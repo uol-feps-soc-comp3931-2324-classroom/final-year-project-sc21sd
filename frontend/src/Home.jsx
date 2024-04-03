@@ -1,97 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import './Header.css'; // Ensure your CSS is correctly set up
-import { useNavigate,Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import SimplifiedCandlestickChart from "./SimplifiedCandlestickChart.jsx"; 
 
-function debounce(func, delay) {
-  let timer;
-  return function(...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
-  };
-}
-
-const SearchBar = ({ onSearchChange, value }) => {
-  return (
-    <div className="search-bar">
-      <input
-        type="text"
-        value={value}
-        onChange={onSearchChange}
-        placeholder="Search for stocks..."
-      />
-    </div>
-  );
-};
-
-const SuggestionsList = ({ suggestions }) => {
-    const navigate = useNavigate(); // Hook to enable navigation
-  
-    const handleSuggestionClick = (ticker) => {
-      navigate(`/stock/${ticker}`); // Route to navigate to
-    };
-  
-    return (
-      <ul className="suggestions-list">
-        {suggestions.map((suggestion, index) => (
-          <li key={index} onClick={() => handleSuggestionClick(suggestion.ticker)}>
-            {suggestion.ticker} - {suggestion.name}
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
-const Header = () => {
-  return (
-    <header className="header">
-      <div className="logo">STOCK</div>
-      <nav>
-      <Link to ='/'><button >Search</button></Link>
-          <Link to ='/watchlist'><button>Watchlist</button></Link>
-          <Link to ='/portfolio'><button>Portfolio</button></Link>
-      </nav>
-    </header>
-  );
-};
-
-const Home = () => {
-  const [searchInput, setSearchInput] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-
-  const fetchSuggestions = async (query) => {
-    try {
-      const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-      const data = await response.json();
-      setSuggestions(data); // Directly use Tiingo's response data
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-      setSuggestions([]);
-    }
-  };
-
-  const debouncedFetchSuggestions = debounce(fetchSuggestions, 500);
+const StockVisualization = ({ ticker = 'FIN2' }) => {
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    if (searchInput.trim()) {
-      debouncedFetchSuggestions(searchInput);
-    } else {
-      setSuggestions([]);
-    }
-  }, [searchInput]);
+    fetch(`/api/stocks/${ticker}`)
+      .then(response => response.json())
+      .then(result => {
+        if (result.data) {
+          const formattedData = result.data.map(item => ({
+            ...item,
+            date: new Date(item.date).toLocaleDateString(),
+            open: Number(item.open),
+            high: Number(item.high),
+            low: Number(item.low),
+            close: Number(item.close),
+          }));
+          setData(formattedData);
+        }
+      })
+      .catch(error => console.error('Failed to fetch stock data:', error));
+  }, [ticker]);
 
   return (
     <div>
-      <Header />
-      <div className="search-area"> 
-        <div className="search-container">
-          <SearchBar value={searchInput} onSearchChange={(e) => setSearchInput(e.target.value)} />
-          <SuggestionsList suggestions={suggestions} />
-        </div>
-      </div>
+      <h2>Line Chart for {ticker}</h2>
+      <LineChart
+        width={600}
+        height={300}
+        data={data}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="close" stroke="#8884d8" activeDot={{ r: 8 }} />
+      </LineChart>
+
+      <h2>Candlestick Chart for {ticker}</h2>
+      <SimplifiedCandlestickChart data={data}/>
     </div>
   );
 };
 
-export default Home;
+export default StockVisualization;
