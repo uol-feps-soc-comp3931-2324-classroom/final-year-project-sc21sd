@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css'; // Ensure your CSS is correctly set up
+import { useNavigate,Link } from 'react-router-dom';
 
 function debounce(func, delay) {
   let timer;
@@ -25,23 +26,31 @@ const SearchBar = ({ onSearchChange, value }) => {
 };
 
 const SuggestionsList = ({ suggestions }) => {
-  return (
-    <ul className="suggestions-list">
-      {suggestions.map((suggestion, index) => (
-        <li key={index}>{suggestion.ticker} - {suggestion.name}</li>
-      ))}
-    </ul>
-  );
-};
+    const navigate = useNavigate(); // Hook to enable navigation
+  
+    const handleSuggestionClick = (ticker) => {
+      navigate(`/stock/${ticker}`); // Route to navigate to
+    };
+  
+    return (
+      <ul className="suggestions-list">
+        {suggestions.map((suggestion, index) => (
+          <li key={index} onClick={() => handleSuggestionClick(suggestion.ticker)}>
+            {suggestion.ticker} - {suggestion.name}
+          </li>
+        ))}
+      </ul>
+    );
+  };
 
 const Header = () => {
   return (
     <header className="header">
-      <div className="logo">STOCK SEARCH</div>
+      <div className="logo">STOCK</div>
       <nav>
-        <button>Search</button>
-        <button>Watchlist</button>
-        <button>Portfolio</button>
+      <Link to ='/'><button >Search</button></Link>
+          <Link to ='/watchlist'><button>Watchlist</button></Link>
+          <Link to ='/portfolio'><button>Portfolio</button></Link>
       </nav>
     </header>
   );
@@ -75,8 +84,8 @@ const Home = () => {
   return (
     <div>
       <Header />
-      <div className="search-area"> {/* This will center the search bar and suggestion list */}
-        <div className="search-container"> {/* This holds the search bar and suggestions list */}
+      <div className="search-area"> 
+        <div className="search-container">
           <SearchBar value={searchInput} onSearchChange={(e) => setSearchInput(e.target.value)} />
           <SuggestionsList suggestions={suggestions} />
         </div>
