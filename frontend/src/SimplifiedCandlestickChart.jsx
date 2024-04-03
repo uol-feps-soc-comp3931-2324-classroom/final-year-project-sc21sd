@@ -7,7 +7,7 @@ const renderCandleShape = (props) => {
   const { open, close, high, low } = payload;
   
   const isRising = open < close;
-  const fill = isRising ? '#00ff00' : '#ff0000';
+  const fill = isRising ? '#228B22' : '#ff0000';
 
   // Calculate the coordinates for each part of the candlestick
   const y1 = scale(open);
@@ -38,14 +38,16 @@ const SimplifiedCandlestickChart = ({ data }) => {
   const scaleY = value => (1 - (value - (minY)) / ((maxY + padding) - (minY - padding))) * 300; 
 
   return (
-    <ResponsiveContainer width="100%" height={400}>
+    <ResponsiveContainer width={'100%'} height={400}>
       <BarChart data={sortedData} barCategoryGap={1}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="date" />
-        {/* Include the padding in the domain */}
-        <YAxis type="number" domain={[minY - padding, maxY + padding]} />
+        <YAxis 
+          type="number" 
+          domain={[0, maxY + padding]}
+          tickFormatter={tick => Math.round(tick)}
+        />
         <Tooltip />
-        {/* Pass scaleY function to the shape */}
         <Bar dataKey="high" shape={(props) => renderCandleShape({ ...props, scale: scaleY })} />
       </BarChart>
     </ResponsiveContainer>

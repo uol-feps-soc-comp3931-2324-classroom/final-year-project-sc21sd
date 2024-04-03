@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import SimplifiedCandlestickChart from "./SimplifiedCandlestickChart.jsx"; 
+import StockAreaChart from "./StockAreaChart.jsx"; 
+import StockInfoHeader from "./StockInfoHeader.jsx"; 
 
-const StockVisualization = ({ ticker = 'FIN2' }) => {
+const StockVisualization = ({ ticker = 'ENRG1' }) => {
   const [data, setData] = useState([]);
+  const [chartType, setChartType] = useState('line'); // Default to line chart
+  const [companyInfo, setCompanyInfo] = useState({
+    companyName: 'Tech Company 3',
+    currentPrice: null,
+    priceChange: null,
+    percentageChange: null
+  });
 
   useEffect(() => {
     fetch(`/api/stocks/${ticker}`)
@@ -18,31 +27,71 @@ const StockVisualization = ({ ticker = 'FIN2' }) => {
             low: Number(item.low),
             close: Number(item.close),
           }));
+  
           setData(formattedData);
+  
+          if (formattedData.length > 0) {
+            const latestData = formattedData[formattedData.length - 1];
+            const firstData = formattedData[formattedData.length - 2];
+            const priceChange = latestData.close - firstData.close;
+            const percentageChange = (priceChange / firstData.close) * 100;
+  
+            setCompanyInfo({
+              companyName: 'Tech Company 3', // You would get this from somewhere else if it's dynamic
+              currentPrice: latestData.close,
+              priceChange: priceChange.toFixed(2),
+              percentageChange: percentageChange.toFixed(2),
+            });
+          }
         }
       })
       .catch(error => console.error('Failed to fetch stock data:', error));
   }, [ticker]);
+  
+
+  const renderChart = () => {
+    switch(chartType) {
+      case 'line':
+      return (
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart
+            data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="close" stroke="#5ACF59" activeDot={{ r: 8 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      );
+      case 'candlestick':
+        return <SimplifiedCandlestickChart data={data}/>;
+      case 'area':
+        return <StockAreaChart data={data}/>;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div>
-      <h2>Line Chart for {ticker}</h2>
-      <LineChart
-        width={600}
-        height={300}
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="close" stroke="#8884d8" activeDot={{ r: 8 }} />
-      </LineChart>
-
-      <h2>Candlestick Chart for {ticker}</h2>
-      <SimplifiedCandlestickChart data={data}/>
+      <div>
+      <StockInfoHeader
+        companyName={companyInfo.companyName}
+        ticker={ticker}
+        currentPrice={companyInfo.currentPrice}
+        priceChange={companyInfo.priceChange}
+        percentageChange={companyInfo.percentageChange}
+      />
+        
+        <button onClick={() => setChartType('line')}>Line Chart</button>
+        <button onClick={() => setChartType('candlestick')}>Candlestick Chart</button>
+        <button onClick={() => setChartType('area')}>Area Chart</button>
+      </div>
+      <h2>{chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart for {ticker}</h2>
+      {renderChart()}
     </div>
   );
 };

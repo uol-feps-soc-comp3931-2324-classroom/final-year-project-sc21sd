@@ -17,7 +17,7 @@ const db = new sqlite3.Database('./myfinanceapp.db', (err) => {
 app.get('/api/stocks/:ticker', (req, res) => {
     const ticker = req.params.ticker.toUpperCase();
     // Updated SQL query to fetch additional data
-    const sql = `SELECT date, openPrice AS open, dayHigh AS high, dayLow AS low, closePrice AS close 
+    const sql = `SELECT date, openPrice AS open, dayHigh AS high, dayLow AS low, closePrice AS close, companyName AS companyName
                  FROM stocks WHERE ticker = ? ORDER BY date`;
   
     db.all(sql, [ticker], (err, rows) => {
