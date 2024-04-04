@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaRegChartBar, FaTools} from 'react-icons/fa';
 import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
 import StockInfoHeader from "./StockInfoHeader.jsx";
 import SimplifiedCandlestickChart from "./SimplifiedCandlestickChart.jsx";
 import StockAreaChart from "./StockAreaChart.jsx";
+import ChartIcons from './ChartIcons.jsx';
+
 
 const StockVisualization = ({ ticker = 'FIN3' }) => {
   const [data, setData] = useState([]);
@@ -80,6 +83,25 @@ const StockVisualization = ({ ticker = 'FIN3' }) => {
       }
     };
   };
+  const renderChart = () => {
+    switch(chartType) {
+      case 'line':
+        return (
+          <HighchartsReact
+            highcharts={Highcharts}
+            constructorType={'stockChart'}
+            options={getChartOptions()}
+            containerProps={{ style: { height: '100%', minHeight: '500px' } }}
+          />
+        );
+      case 'candlestick':
+        return <SimplifiedCandlestickChart data={data}/>;
+      case 'area':
+        return <StockAreaChart data={data}/>;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div>
@@ -90,27 +112,8 @@ const StockVisualization = ({ ticker = 'FIN3' }) => {
         priceChange={companyInfo.priceChange}
         percentageChange={companyInfo.percentageChange}
       />
-
-      <div>
-        <button onClick={() => setChartType('line')}>Line Chart</button>
-        <button onClick={() => setChartType('candlestick')}>Candlestick Chart</button>
-        <button onClick={() => setChartType('area')}>Area Chart</button>
-      </div>
-      
-      {chartType === 'line' && (
-        <HighchartsReact
-          highcharts={Highcharts}
-          constructorType={'stockChart'}
-          options={getChartOptions()}
-          containerProps={{ style: { height: '100%', minHeight: '500px' } }} //
-        />
-      )}
-      {chartType === 'candlestick' && (
-        <SimplifiedCandlestickChart data={data}/>
-      )}
-      {chartType === 'area' && (
-        <StockAreaChart data={data}/>
-      )}
+      <ChartIcons setChartType={setChartType}/>
+      {renderChart()}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
+import ChartIcons from "./ChartIcons.jsx";
 
 const SimplifiedCandlestickChart = ({ data }) => {
   const candlestickData = data.map(item => [
@@ -35,12 +36,14 @@ const SimplifiedCandlestickChart = ({ data }) => {
   
 
   return (
-    <HighchartsReact
+    <div>
+      <HighchartsReact
       highcharts={Highcharts}
       constructorType={'stockChart'}
       options={options}
       containerProps={{ style: { height: '100%', minHeight: '500px' } }} //
     />
+    </div>
   );
 };
 

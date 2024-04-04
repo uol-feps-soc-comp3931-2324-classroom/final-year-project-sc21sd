@@ -1,6 +1,7 @@
 import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import ChartIcons from "./ChartIcons.jsx";
 
 const StockAreaChart = ({ data }) => {
   // Prepare data for Highcharts
@@ -46,11 +47,13 @@ const StockAreaChart = ({ data }) => {
   
 
   return (
-    <HighchartsReact
+    <div>
+        <HighchartsReact
       highcharts={Highcharts}
       options={options}
       containerProps={{ style: { height: '100%', minHeight: '500px' } }} //
     />
+    </div>
   );
 };
 
