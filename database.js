@@ -42,7 +42,7 @@ db.serialize(() => {
   const insertStockData = (ticker, companyName, openPrice, trend, sector) => {
     let dayHigh, dayLow, closePrice;
   
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 30; i++) {
       
       if (trend === 'up') {
         dayHigh = openPrice + 6 + (i * 0.5); // Gradual increase

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import SimplifiedCandlestickChart from "./SimplifiedCandlestickChart.jsx"; 
-import StockAreaChart from "./StockAreaChart.jsx"; 
-import StockInfoHeader from "./StockInfoHeader.jsx"; 
+import Highcharts from 'highcharts/highstock';
+import HighchartsReact from 'highcharts-react-official';
+import StockInfoHeader from "./StockInfoHeader.jsx";
+import SimplifiedCandlestickChart from "./SimplifiedCandlestickChart.jsx";
+import StockAreaChart from "./StockAreaChart.jsx";
 
-const StockVisualization = ({ ticker = 'ENRG1' }) => {
+const StockVisualization = ({ ticker = 'FIN3' }) => {
   const [data, setData] = useState([]);
-  const [chartType, setChartType] = useState('line'); // Default to line chart
+  const [chartType, setChartType] = useState('line');
   const [companyInfo, setCompanyInfo] = useState({
-    companyName: 'Tech Company 3',
+    companyName: '',
     currentPrice: null,
     priceChange: null,
     percentageChange: null
@@ -20,25 +21,26 @@ const StockVisualization = ({ ticker = 'ENRG1' }) => {
       .then(result => {
         if (result.data) {
           const formattedData = result.data.map(item => ({
-            ...item,
-            date: new Date(item.date).toLocaleDateString(),
+            x: new Date(item.date).getTime(),
+            y: item.close,
             open: Number(item.open),
             high: Number(item.high),
             low: Number(item.low),
             close: Number(item.close),
+            name: item.companyName
           }));
-  
           setData(formattedData);
-  
+
+          // Assuming the last entry is the most recent
           if (formattedData.length > 0) {
             const latestData = formattedData[formattedData.length - 1];
             const firstData = formattedData[formattedData.length - 2];
             const priceChange = latestData.close - firstData.close;
             const percentageChange = (priceChange / firstData.close) * 100;
-  
+
             setCompanyInfo({
-              companyName: 'Tech Company 3', // You would get this from somewhere else if it's dynamic
-              currentPrice: latestData.close,
+              companyName: 'Tech Company 3',
+              currentPrice: latestData.y,
               priceChange: priceChange.toFixed(2),
               percentageChange: percentageChange.toFixed(2),
             });
@@ -47,37 +49,40 @@ const StockVisualization = ({ ticker = 'ENRG1' }) => {
       })
       .catch(error => console.error('Failed to fetch stock data:', error));
   }, [ticker]);
-  
 
-  const renderChart = () => {
-    switch(chartType) {
-      case 'line':
-      return (
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart
-            data={data}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="close" stroke="#5ACF59" activeDot={{ r: 8 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      );
-      case 'candlestick':
-        return <SimplifiedCandlestickChart data={data}/>;
-      case 'area':
-        return <StockAreaChart data={data}/>;
-      default:
-        return null;
-    }
+  const getChartOptions = () => {
+    return {
+      title: {
+        text: `     `
+      },
+      series: [{
+        data: data,
+        name: ticker,
+        tooltip: {
+          valueDecimals: 2
+        },
+        color:'#008800',
+      }],
+      xAxis: {
+        type: 'datetime'
+      },
+      chart: {
+        zoomType: 'x'
+      },
+      navigator: {
+        enabled: true
+      },
+      scrollbar: {
+        enabled: true
+      },
+      rangeSelector: {
+        selected: 1
+      }
+    };
   };
 
   return (
     <div>
-      <div>
       <StockInfoHeader
         companyName={companyInfo.companyName}
         ticker={ticker}
@@ -85,13 +90,27 @@ const StockVisualization = ({ ticker = 'ENRG1' }) => {
         priceChange={companyInfo.priceChange}
         percentageChange={companyInfo.percentageChange}
       />
-        
+
+      <div>
         <button onClick={() => setChartType('line')}>Line Chart</button>
         <button onClick={() => setChartType('candlestick')}>Candlestick Chart</button>
         <button onClick={() => setChartType('area')}>Area Chart</button>
       </div>
-      <h2>{chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart for {ticker}</h2>
-      {renderChart()}
+      
+      {chartType === 'line' && (
+        <HighchartsReact
+          highcharts={Highcharts}
+          constructorType={'stockChart'}
+          options={getChartOptions()}
+          containerProps={{ style: { height: '100%', minHeight: '500px' } }} //
+        />
+      )}
+      {chartType === 'candlestick' && (
+        <SimplifiedCandlestickChart data={data}/>
+      )}
+      {chartType === 'area' && (
+        <StockAreaChart data={data}/>
+      )}
     </div>
   );
 };

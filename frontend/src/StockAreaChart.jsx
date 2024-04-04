@@ -1,21 +1,56 @@
 import React from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 
 const StockAreaChart = ({ data }) => {
-  // Sort data by date for consistent rendering
-  const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+  // Prepare data for Highcharts
+  const areaChartData = data.map(item => ([
+    item.x,
+    item.high,
+  ]));
+
+  const options = {
+    chart: {
+      type: 'area'
+    },
+    title: {
+      text: '  '
+    },
+    xAxis: {
+      type: 'datetime'
+    },
+    yAxis: {
+      title: {
+        text: 'Price'
+      }
+    },
+    series: [{
+      name: '   ',
+      data: areaChartData,
+      lineColor: '#228B22', // Green line on top of the area
+      color: '#228B22',
+      fillColor: {
+        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        stops: [
+          [0, 'rgba(34, 139, 34, 1)'],  
+          [1, 'rgba(34, 139, 34, 0)']   
+        ]
+      },
+      threshold: null
+    }],
+    tooltip: {
+      valueDecimals: 2
+    },
+
+  };
+  
 
   return (
-    <ResponsiveContainer  width={'100%'} height={300}>
-      <AreaChart data={sortedData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
-        <YAxis />
-        <Tooltip />
-        {/* Define the area between low and high prices */}
-        <Area type="monotone" dataKey="high" stroke="#5ACF59" fill="#92E491" />
-      </AreaChart>
-    </ResponsiveContainer>
+    <HighchartsReact
+      highcharts={Highcharts}
+      options={options}
+      containerProps={{ style: { height: '100%', minHeight: '500px' } }} //
+    />
   );
 };
 
