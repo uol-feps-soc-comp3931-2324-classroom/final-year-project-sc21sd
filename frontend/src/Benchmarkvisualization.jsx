@@ -14,15 +14,17 @@ const fetchData = async (ticker) => {
 
 // Calculates Growth Indices
 const calculateGrowthIndices = (data) => {
-  let indices = [];
-  for (let i = 0; i < data.length; i++) {
-    for (let j = i + 1; j < data.length; j++) {
-      const gi = (data[j].close - data[i].close) / data[i].close;
-      indices.push([i, j, gi]);
-    }
-  }
-  return indices;
-};
+    const points = [];
+    data.forEach((startPoint, rowIndex) => {
+      data.forEach((endPoint, colIndex) => {
+        if (colIndex > rowIndex) {
+          const growthIndex = (endPoint.close - startPoint.close) / startPoint.close;
+          points.push([rowIndex, colIndex, growthIndex]);
+        }
+      });
+    });
+    return points;
+  };
 
 // Calculates Rank Indices for assetData against marketData
 const calculateRankIndices = (assetGrowthIndices, marketGrowthIndices) => {
@@ -34,6 +36,15 @@ const calculateRankIndices = (assetGrowthIndices, marketGrowthIndices) => {
   });
 };
 
+const determineColor = (value) => {
+    // Define your threshold values and corresponding colors
+    if (value < 0) return '#ff4d4d'; // dark red for significant loss
+       // light red for loss
+    if (value === 0) return '#ffff99';  // yellow for no change
+  //   if (value <= 0.1) return '#99ff99'; // light green for gain
+    return '#00b300';                   // dark green for significant gain
+  };
+
 // Visualize Indices with Highcharts
 const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'FIN1' }) => {
   const [growthChartOptions, setGrowthChartOptions] = useState({});
@@ -44,6 +55,12 @@ const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'FIN1' }) => 
       const marketGrowthIndices = calculateGrowthIndices(marketData);
       const assetGrowthIndices = calculateGrowthIndices(assetData);
       const assetRankIndices = calculateRankIndices(assetGrowthIndices, marketGrowthIndices);
+      
+      const coloredData = marketGrowthIndices.map((point) => {
+        const color = determineColor(point[2]);
+      return { x: point[0], y: point[1], color };
+      }
+      );
 
       // Configure Highcharts options for Growth Index visualization
       // Placeholder: configure your Highcharts options for Growth Index
@@ -79,7 +96,7 @@ const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'FIN1' }) => 
         series: [{
           name: 'Growth Index',
           borderWidth: 1,
-          data: calculateGrowthIndices(marketData),
+          data: coloredData,
           dataLabels: {
             enabled: false,
           }
