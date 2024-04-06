@@ -24,14 +24,14 @@ const calculateGrowthIndices = (data) => {
 // Function to determine color based on growth index value
 const determineColor = (value) => {
   // Define your threshold values and corresponding colors
-  if (value < -0.1) return '#ff4d4d'; // dark red for significant loss
-  if (value < 0) return '#ff9999';    // light red for loss
+  if (value < 0) return '#ff4d4d'; // dark red for significant loss
+     // light red for loss
   if (value === 0) return '#ffff99';  // yellow for no change
-  if (value <= 0.1) return '#99ff99'; // light green for gain
+//   if (value <= 0.1) return '#99ff99'; // light green for gain
   return '#00b300';                   // dark green for significant gain
 };
 
-const GrowthMatrixVisualization = ({ ticker ='TECH3' }) => {
+const GrowthMatrixVisualization = ({ ticker ='FIN500' }) => {
   const [options, setOptions] = useState({});
 
   useEffect(() => {
@@ -66,6 +66,7 @@ const GrowthMatrixVisualization = ({ ticker ='TECH3' }) => {
             categories: response.data.data.map((point) => point.date),
             gridLineWidth: 0
           },
+          
           colorAxis: {
             min: -0.1,
             max: 0.1,
@@ -84,6 +85,9 @@ const GrowthMatrixVisualization = ({ ticker ='TECH3' }) => {
             //   color: '#000000'
             // }
           }],
+          legend: {
+            enabled: false
+          },
           tooltip: {
             formatter: function () {
                 

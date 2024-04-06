@@ -8,7 +8,7 @@ import StockAreaChart from "./StockAreaChart.jsx";
 import ChartIcons from './ChartIcons.jsx';
 
 
-const StockVisualization = ({ ticker = 'FIN3' }) => {
+const StockVisualization = ({ ticker = 'FIN500' }) => {
   const [data, setData] = useState([]);
   const [chartType, setChartType] = useState('line');
   const [companyInfo, setCompanyInfo] = useState({

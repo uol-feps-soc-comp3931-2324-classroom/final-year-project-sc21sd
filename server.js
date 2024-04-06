@@ -48,6 +48,23 @@ app.get('/api/stocks/:ticker', (req, res) => {
       });
     });
   });
+  app.get('/api/matrixvis/:ticker', (req, res) => {
+    const ticker = req.params.ticker.toUpperCase();
+    // Updated SQL query to fetch additional data
+    const sql = `SELECT date, openPrice AS open, dayHigh AS high, dayLow AS low, closePrice AS close, companyName AS companyName
+                 FROM stocks WHERE ticker = ? ORDER BY date`;
+  
+    db.all(sql, [ticker], (err, rows) => {
+      if (err) {
+        res.status(400).json({ "error": err.message });
+        return;
+      }
+      res.json({
+        "message": "success",
+        "data": rows
+      });
+    });
+  });
   
 
 // Specify the port to listen on
