@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import GrowthMatrix from './GrowthMatrix';
-import Benchmarkvisualization from './Benchmarkvisualization'
-
+import Benchmarkvisualization from './Benchmarkvisualization';
+import Stockdata from './Stockdata';
 
 function App() {
   return (
@@ -12,6 +12,7 @@ function App() {
         <Route path="/stock/:ticker" element={<Home />} />
         <Route path="/growthmatrixvis/:ticker" element={<GrowthMatrix />} />
         <Route path="/matrixvis/:ticker" element={<Benchmarkvisualization />} />
+        <Route path="/stockdata/:ticker" element={<Stockdata />} />
       </Routes>
     </Router>
   );

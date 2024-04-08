@@ -56,9 +56,8 @@ const determineColor = (value) => {
   };
 
 // Visualize Indices with Highcharts
-const VisualizeIndices = ({ marketTicker = 'TECH100', assetTicker = 'TECH1' }) => {
+const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'TECH2' }) => {
   const [growthChartOptions, setGrowthChartOptions] = useState({});
-  const [growthChartOptions1, setGrowthChartOptions1] = useState({});
   const [rankChartOptions, setRankChartOptions] = useState({});
 
   useEffect(() => {
