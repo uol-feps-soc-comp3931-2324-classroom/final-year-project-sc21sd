@@ -31,6 +31,28 @@ app.get('/api/stocks/:ticker', (req, res) => {
       });
     });
   });
+
+  app.get('/api/searchCompanies', (req, res) => {
+    const query = req.query.q;
+    if (!query) {
+      return res.json([]);
+    }
+  
+    // Use parameterized query to prevent SQL injection
+    const sql = `SELECT DISTINCT companyName,ticker FROM stocks WHERE companyName LIKE ? LIMIT 10;`;
+  
+    // '%' symbols are used to indicate partial match before and after the query
+    db.all(sql, [`%${query}%`], (err, rows) => {
+      if (err) {
+        console.error(err.message);
+        res.status(500).send('Error retrieving data from the database');
+      } else {
+        res.json(rows);
+      }
+    });
+  });
+  
+
   app.get('/api/growthmatrixvis/:ticker', (req, res) => {
     const ticker = req.params.ticker.toUpperCase();
     // Updated SQL query to fetch additional data

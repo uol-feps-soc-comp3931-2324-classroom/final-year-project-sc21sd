@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams,useNavigate  } from 'react-router-dom';
 import { FaRegChartBar, FaTools} from 'react-icons/fa';
 import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
@@ -8,9 +9,13 @@ import StockAreaChart from "./StockAreaChart.jsx";
 import ChartIcons from './ChartIcons.jsx';
 
 
-const StockVisualization = ({ ticker = 'FIN500' }) => {
+const StockVisualization = ({}) => {
+  const { ticker } = useParams();
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [chartType, setChartType] = useState('line');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
   const [companyInfo, setCompanyInfo] = useState({
     companyName: '',
     currentPrice: null,
@@ -19,7 +24,9 @@ const StockVisualization = ({ ticker = 'FIN500' }) => {
   });
 
   useEffect(() => {
-    fetch(`/api/stocks/${ticker}`)
+    
+    const fetchURL = `/api/stocks/${ticker}`; // Fallback to 'TECH100' if no ticker is provided
+    fetch(fetchURL)
       .then(response => response.json())
       .then(result => {
         if (result.data) {
@@ -40,9 +47,10 @@ const StockVisualization = ({ ticker = 'FIN500' }) => {
             const firstData = formattedData[formattedData.length - 2];
             const priceChange = latestData.close - firstData.close;
             const percentageChange = (priceChange / firstData.close) * 100;
+            const name = latestData.name;
 
             setCompanyInfo({
-              companyName: 'Tech Company 3',
+              companyName: name,
               currentPrice: latestData.y,
               priceChange: priceChange.toFixed(2),
               percentageChange: percentageChange.toFixed(2),
@@ -83,6 +91,52 @@ const StockVisualization = ({ ticker = 'FIN500' }) => {
       }
     };
   };
+
+  function debounce(func, wait) {
+    let timeout;
+  
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+  
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+  
+
+  const selectCompany = (company) => {
+    setSearchQuery(company.companyName); // Set the search query to the company name
+    setSuggestions([]); // Clear suggestions
+    navigate(`/stocks/${company.ticker}`);
+  };
+
+  
+  const fetchCompanyNames = debounce((query) => {
+    if (!query.trim()) return;
+  
+    fetch(`/api/searchCompanies?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        setSuggestions(data); // Assuming the API returns an array of objects with a companyName property
+      })
+      .catch(error => {
+        console.error("Error fetching company names:", error);
+      });
+  }, 300);
+  
+  
+
+  
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    // Optionally debounce this call
+    fetchCompanyNames(query); // Implement this method based on your API
+  };
+
   const renderChart = () => {
     switch(chartType) {
       case 'line':
@@ -111,6 +165,10 @@ const StockVisualization = ({ ticker = 'FIN500' }) => {
         currentPrice={companyInfo.currentPrice}
         priceChange={companyInfo.priceChange}
         percentageChange={companyInfo.percentageChange}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        suggestions={suggestions} 
+        selectCompany={selectCompany}
       />
       <ChartIcons setChartType={setChartType}/>
       {renderChart()}
