@@ -38,6 +38,7 @@ const ChartIcons = ({ setChartType }) => {
                         <li style={{ padding: '5px 10px' }} onClick={() => setChartType('candlestick')}>Candle</li>
                         <li style={{ padding: '5px 10px' }} onClick={() => setChartType('line')}>Line</li>
                         <li style={{ padding: '5px 10px' }} onClick={() => setChartType('area')}>Area</li>
+                        <li style={{ padding: '5px 10px' }} onClick={() => setChartType('matrix')}>Growth Indicator</li>
                     </ul>
                 )}
             </div>

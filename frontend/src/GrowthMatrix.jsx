@@ -31,7 +31,7 @@ const determineColor = (value) => {
   return '#00b300';                   // dark green for significant gain
 };
 
-const GrowthMatrixVisualization = ({ ticker ='FIN500' }) => {
+const GrowthMatrixVisualization = ({ticker}) => {
   const [options, setOptions] = useState({});
 
   useEffect(() => {

@@ -7,7 +7,7 @@ import StockInfoHeader from "./StockInfoHeader.jsx";
 import SimplifiedCandlestickChart from "./SimplifiedCandlestickChart.jsx";
 import StockAreaChart from "./StockAreaChart.jsx";
 import ChartIcons from './ChartIcons.jsx';
-
+import GrowthMatrix from './GrowthMatrix.jsx';
 
 const StockVisualization = ({}) => {
   const { ticker } = useParams();
@@ -25,7 +25,14 @@ const StockVisualization = ({}) => {
 
   useEffect(() => {
     
-    const fetchURL = `/api/stocks/${ticker}`; // Fallback to 'TECH100' if no ticker is provided
+    let fetchURL;
+  if (chartType === 'matrix') {
+    fetchURL = `/api/growthmatrixvis/${ticker}`;
+  } else {
+    fetchURL = `/api/stocks/${ticker}`;
+  }
+
+  fetch(fetchURL)
     fetch(fetchURL)
       .then(response => response.json())
       .then(result => {
@@ -152,6 +159,9 @@ const StockVisualization = ({}) => {
         return <SimplifiedCandlestickChart data={data}/>;
       case 'area':
         return <StockAreaChart data={data}/>;
+      
+      case 'matrix':
+        return <GrowthMatrix ticker={ticker}/>;
       default:
         return null;
     }

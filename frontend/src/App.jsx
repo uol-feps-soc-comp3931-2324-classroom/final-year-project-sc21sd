@@ -11,7 +11,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/stocks/:ticker" element={<Home />} />
-        <Route path="/growthmatrixvis/:ticker" element={<GrowthMatrix />} />
+        {/* <Route path="/growthmatrixvis/:ticker" element={<GrowthMatrix />} /> */}
         <Route path="/matrixvis/:ticker" element={<Benchmarkvisualization />} />
         <Route path="/stockdata/:ticker" element={<Stockdata />} />
       </Routes>
