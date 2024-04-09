@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Radar } from 'react-chartjs-2';
 import 'chart.js/auto'; // Import to register the appropriate chart type
 
-const StockData = ({ ticker = 'TECH3' }) => {
+const StockData = ({ ticker}) => {
   const [stockMetrics, setStockMetrics] = useState(null);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const StockData = ({ ticker = 'TECH3' }) => {
 
   // Wrap the Radar component in a div with inline styles to control its size
   return (
-    <div style={{ width: '500px', height: '500px' }}> {/* Adjust these values as needed */}
+    <div> {/* Adjust these values as needed */}
       <h2>Radar Chart for {ticker}</h2>
       {stockMetrics ? (
         <Radar data={radarChartData} options={options} />

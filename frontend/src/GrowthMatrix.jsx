@@ -56,7 +56,7 @@ const GrowthMatrixVisualization = ({ticker}) => {
             plotBorderWidth: 1
           },
           title: {
-            text: 'Growth Matrix Visualization'
+            text: ' '
           },
           xAxis: {
             categories: response.data.data.map((point) => point.date),
@@ -78,12 +78,8 @@ const GrowthMatrixVisualization = ({ticker}) => {
           },
           series: [{
             name: 'Growth Index',
-            borderWidth: 0,
+            borderWidth: -0.1,
             data: coloredData,
-            // dataLabels: {
-            
-            //   color: '#000000'
-            // }
           }],
           legend: {
             enabled: false
@@ -91,7 +87,7 @@ const GrowthMatrixVisualization = ({ticker}) => {
           tooltip: {
             formatter: function () {
                 
-            return `<b>${this.series.xAxis.categories[this.point.x]}</b> to <b>${this.series.yAxis.categories[this.point.y]}</b>: <b>${this.point.value.toFixed(2)}</b>`;
+            return `<b>${this.series.xAxis.categories[this.point.x]}</b> and <b>${this.series.yAxis.categories[this.point.y]}</b>`;
             }
           },
         };

@@ -47,7 +47,7 @@ const StockInfoHeader = ({ companyName, ticker, currentPrice, priceChange, perce
           <h2>{companyName} ({ticker})</h2>
           {/* Price and percentage change on the same line */}
           <div style={{ display: 'flex', alignItems: 'baseline' }}>
-          <h2 style={{ marginRight: '10px' }}>${currentPrice.toFixed(2)}</h2>
+          <h2 style={{ marginRight: '10px' }}>${currentPrice}</h2>
             <p style={{ color: priceChangeColor }}>
               ${priceChange} ({percentageChange}%)
             </p>

@@ -56,9 +56,24 @@ const determineColor = (value) => {
   };
 
 // Visualize Indices with Highcharts
-const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'TECH2' }) => {
+const VisualizeIndices = ({ marketTicker, assetTicker}) => {
   const [growthChartOptions, setGrowthChartOptions] = useState({});
   const [rankChartOptions, setRankChartOptions] = useState({});
+
+  if (assetTicker === 'TECH1' || assetTicker === 'TECH2' || assetTicker === 'TECH3'){
+    marketTicker = 'TECH100'
+  }
+  else if (assetTicker === 'ENGR1' || assetTicker === 'ENGR2' || assetTicker === 'ENGR3'){
+    marketTicker = 'ENGR150'
+  }
+  else if (assetTicker === 'SERV1' || assetTicker === 'SERV2' || assetTicker === 'SERV3'){
+    marketTicker = 'SERV200'
+  }
+  else if (assetTicker === 'FIN1' || assetTicker === 'FIN2' || assetTicker === 'FIN3'){
+    marketTicker = 'FIN500'
+  }
+
+  console.log(marketTicker)
 
   useEffect(() => {
     Promise.all([fetchData(marketTicker), fetchData(assetTicker)]).then(([marketData, assetData]) => {
@@ -66,10 +81,6 @@ const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'TECH2' }) =>
       const assetGrowthIndices = calculateGrowthIndices(assetData);
       const assetRankIndices = calculateRankIndices(assetGrowthIndices, marketGrowthIndices);
 
-      // const seriesData = assetRankIndices.map((value, index) => {
-      //   return [index, index, value]; // [x, y, value]
-      // });
-      
       const coloredData = marketGrowthIndices.map((point) => {
         const color = determineColor(point[2]);
       return { x: point[0], y: point[1], color };
@@ -100,14 +111,14 @@ const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'TECH2' }) =>
           xAxis: {
             categories: marketData.map((data) => data.date),
             title: {
-              text: 'Start Date',
+              text: 'Date of Sale',
             },
             gridLineWidth: 0
           },
           yAxis: {
             categories: marketData.map((data) => data.date),
             title: {
-              text: 'End Date',
+              text: 'Date of Purchase',
             },
             gridLineWidth: 0
           },
@@ -153,9 +164,9 @@ const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'TECH2' }) =>
             min: 0,
             max: assetData.length - 1,
             tickInterval: 1, // Show every category
-            labels: {
-              rotation: -80 // Rotate labels for better fit
-            }
+            title: {
+              text: 'Date of Sale',
+            },
             
           },
           legend: {
@@ -169,7 +180,10 @@ const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'TECH2' }) =>
             tickInterval: 1, // Show every category
             labels: {
               rotation: 0 // Adjust as necessary
-            }
+            },
+            title: {
+              text: 'Date of Purchase',
+            },
           },          
           colorAxis: {
             min: 0,
@@ -185,19 +199,13 @@ const VisualizeIndices = ({ marketTicker = 'FIN500', assetTicker = 'TECH2' }) =>
             data: coloredDatarank,
             dataLabels: {
               enabled: true,
-              // formatter: function () {
-              //   return this.point.value ? 'Outperform' : 'Underperform';
-              // }
             }
           }],
-          // tooltip: {
-          //   formatter: function () {
-          //     const performance = this.point.value === 1 ? 'Outperformed' : 'Underperformed';
-          //     return `<b>Purchase Date:</b> ${this.series.xAxis.categories[this.point.x]}<br>
-          //             <b>Sale Date:</b> ${this.series.yAxis.categories[this.point.y]}<br>
-          //             <b>Performance:</b> ${performance}`;
-          //   },
-          // }
+          tooltip: {
+            formatter: function () {
+              return `<b>${this.series.xAxis.categories[this.point.x]}</b> and <b>${this.series.yAxis.categories[this.point.y]}</b>`;
+            },
+          },
 
         });
       

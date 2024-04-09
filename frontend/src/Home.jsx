@@ -8,6 +8,8 @@ import SimplifiedCandlestickChart from "./SimplifiedCandlestickChart.jsx";
 import StockAreaChart from "./StockAreaChart.jsx";
 import ChartIcons from './ChartIcons.jsx';
 import GrowthMatrix from './GrowthMatrix.jsx';
+import Benchmarkvisualization from './Benchmarkvisualization';
+import Stockdata from './Stockdata';
 
 const StockVisualization = ({}) => {
   const { ticker } = useParams();
@@ -28,7 +30,14 @@ const StockVisualization = ({}) => {
     let fetchURL;
   if (chartType === 'matrix') {
     fetchURL = `/api/growthmatrixvis/${ticker}`;
-  } else {
+  }
+  else if (chartType === 'benchmarking'){
+    fetchURL = `/api/matrixvis/${ticker}`;
+  }
+  else if (chartType === 'data'){
+    fetchURL = `/api/stockdata/${ticker}`;
+  }
+   else {
     fetchURL = `/api/stocks/${ticker}`;
   }
 
@@ -162,6 +171,12 @@ const StockVisualization = ({}) => {
       
       case 'matrix':
         return <GrowthMatrix ticker={ticker}/>;
+
+        case 'benchmarking':
+          return <Benchmarkvisualization assetTicker={ticker}/>;
+        
+        case 'data':
+          return <Stockdata ticker={ticker}/>;
       default:
         return null;
     }

@@ -38,7 +38,9 @@ const ChartIcons = ({ setChartType }) => {
                         <li style={{ padding: '5px 10px' }} onClick={() => setChartType('candlestick')}>Candle</li>
                         <li style={{ padding: '5px 10px' }} onClick={() => setChartType('line')}>Line</li>
                         <li style={{ padding: '5px 10px' }} onClick={() => setChartType('area')}>Area</li>
-                        <li style={{ padding: '5px 10px' }} onClick={() => setChartType('matrix')}>Growth Indicator</li>
+                        <li style={{ padding: '5px 10px' }} onClick={() => setChartType('matrix')}>Growth Indicator (GI)</li>
+                        <li style={{ padding: '5px 10px' }} onClick={() => setChartType('benchmarking')}>GI Against Market</li>
+                        <li style={{ padding: '5px 10px' }} onClick={() => setChartType('data')}>Indicators</li>
                     </ul>
                 )}
             </div>
